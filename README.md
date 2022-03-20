@@ -1,5 +1,7 @@
 # caiorulli/psycho-mantis
 
+[![Build Status](https://cloud.drone.io/api/badges/caiorulli/psycho-mantis/status.svg)](https://cloud.drone.io/caiorulli/psycho-mantis)
+
 FIXME: my new library.
 
 ## Usage

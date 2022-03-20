@@ -1,6 +1,6 @@
 (ns caiorulli.psycho-mantis-test
   (:require [clojure.test :refer [deftest testing is]]
-            [caiorulli.psycho-mantis :refer [definject ask]]))
+            [caiorulli.psycho-mantis :refer [definject ask inject]]))
 
 (deftest definject-test
   (testing "works like defn without dependencies"
@@ -21,4 +21,17 @@
       []
       (reduce + 0 [20 20 (ask :base)]))
 
-    (is (= 42 ((sum-base) {:base 2})))))
+    (is (= 42 ((sum-base) {:base 2}))))
+
+  (testing "is able to use other injectable functions seamlessly"
+    (definject with-emphasis
+      [s]
+      (str s (ask :emphasis)))
+
+    (definject with-prefix-and-emphasis
+      [s]
+      (str (ask :prefix) (inject (with-emphasis s))))
+
+    (is (= "Hello, world!"
+           ((with-prefix-and-emphasis "world") {:emphasis "!"
+                                                :prefix   "Hello, "})))))

@@ -3,21 +3,26 @@
             [defntly.core :refer [defn-update-body]]))
 
 (def ask "ask")
+(def inject "inject")
 
-(defn- replace-ask
+(defn- replace-lexers
   [envsym body]
   (if (coll? body)
-    (if (= (first body) 'ask)
+    (cond
+      (= (first body) 'ask)
       `(get ~envsym ~(second body))
-      (w/walk (partial replace-ask envsym) identity body))
+
+      (= (first body) 'inject)
+      `(~(second body) ~envsym)
+
+      :else
+      (w/walk (partial replace-lexers envsym) identity body))
     body))
 
 (defn- wrap-inject
   [_name body]
-  (prn "before" body)
   (let [envsym (gensym "env")
-        body'  (replace-ask envsym body)]
-    (prn "after" body')
+        body'  (replace-lexers envsym body)]
     `((fn [~envsym]
         ~@body'))))
 

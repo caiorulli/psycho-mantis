@@ -1,6 +1,26 @@
-(ns caiorulli.psycho-mantis)
+(ns caiorulli.psycho-mantis
+  (:require [clojure.walk :as w]
+            [defntly.core :refer [defn-update-body]]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (prn x "Hello, World!"))
+(def ask "ask")
+
+(defn- replace-ask
+  [envsym body]
+  (if (coll? body)
+    (if (= (first body) 'ask)
+      `(get ~envsym ~(second body))
+      (w/walk (partial replace-ask envsym) identity body))
+    body))
+
+(defn- wrap-inject
+  [_name body]
+  (prn "before" body)
+  (let [envsym (gensym "env")
+        body'  (replace-ask envsym body)]
+    (prn "after" body')
+    `((fn [~envsym]
+        ~@body'))))
+
+(defmacro definject
+  [& args]
+  (defn-update-body wrap-inject args))

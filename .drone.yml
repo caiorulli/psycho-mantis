@@ -1,0 +1,10 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: test
+    image: clojure:tools-deps
+    commands:
+      - clojure -T:build ci
+
